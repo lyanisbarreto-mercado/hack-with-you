@@ -1,0 +1,25 @@
+[build]
+  base = "."
+  command = "node scripts/check-netlify-env.cjs && npm ci --prefix backend && npm ci --prefix frontend && npm run build"
+  publish = "frontend/dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "24"
+  # Production calls the API on this site, never a developer's localhost.
+  VITE_API_URL = ""
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["express", "mongoose"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

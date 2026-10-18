@@ -36,3 +36,22 @@ test('database failure propagates so the API does not start without MongoDB', as
   mongoose.connect = async () => { throw failure; };
   await assert.rejects(connectDB(), error => error === failure);
 });
+
+test('concurrent function invocations share a connection attempt', async () => {
+  process.env.MONGO_URI = 'mongodb://127.0.0.1/test';
+  let count = 0;
+  let finish;
+  mongoose.connect = () => { count += 1; return new Promise(resolve => { finish = resolve; }); };
+  const first = connectDB();
+  const second = connectDB();
+  assert.equal(count, 1);
+  finish('connected');
+  assert.deepEqual(await Promise.all([first, second]), ['connected', 'connected']);
+});
+test('failed connections can be retried on the next function invocation', async () => {
+  process.env.MONGO_URI = 'mongodb://127.0.0.1/test';
+  mongoose.connect = async () => { throw new Error('temporary failure'); };
+  await assert.rejects(connectDB(), /temporary failure/);
+  mongoose.connect = async () => 'reconnected';
+  assert.equal(await connectDB(), 'reconnected');
+});
