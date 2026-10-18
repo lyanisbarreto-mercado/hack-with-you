@@ -11,7 +11,7 @@ before(async () => {
   await new Promise(resolve => server.once('listening', resolve));
   base = `http://127.0.0.1:${server.address().port}`;
 });
-after(() => new Promise(resolve => server.close(resolve)));
+after(() => server ? new Promise(resolve => server.close(resolve)) : undefined);
 
 test('health endpoint is public and allows the configured frontend origin', async () => {
   const response = await fetch(`${base}/api/health`, { headers: { Origin: process.env.CLIENT_URL } });
@@ -36,4 +36,19 @@ test('startup rejects missing Auth0 configuration', () => {
   } finally {
     process.env.AUTH0_AUDIENCE = audience;
   }
+});
+
+test('notes cannot be written without a valid access token', async () => {
+  for (const authorization of [undefined, 'Bearer invalid-token']) {
+    const response = await fetch(`${base}/api/notes`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...(authorization ? { Authorization: authorization } : {}) }, body: JSON.stringify({ content: 'private' }) });
+    assert.equal(response.status, 401);
+  }
+});
+
+test('profile updates require a valid access token', async () => {
+  const response = await fetch(`${base}/api/profile/me`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ displayName: 'Untrusted request' }),
+  });
+  assert.equal(response.status, 401);
 });

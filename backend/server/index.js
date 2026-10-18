@@ -10,13 +10,12 @@ function createApp() {
   for (const name of ['AUTH0_ISSUER_BASE_URL', 'AUTH0_AUDIENCE', 'CLIENT_URL']) {
     if (!process.env[name]) throw new Error(`Missing required environment variable: ${name}`);
   }
-  const requireAuth = require('./middleware/auth');
   const app = express();
   app.use(helmet());
-  app.use(cors({ origin: process.env.CLIENT_URL }));
-  app.use(express.json({ limit: '32kb' }));
+  app.use(cors({ origin: process.env.CLIENT_URL.split(',') }));
+  app.use(express.json({ limit: '128kb' }));
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
-  app.get('/api/notes', requireAuth, (req, res) => res.json({ message: 'confirm' }));
+  app.use('/api/notes', require('./routes/notes'));
   app.use('/api/profile', require('./routes/profile'));
   app.use((err, req, res, next) => {
     const status = err.status || 500;
@@ -35,16 +34,10 @@ async function start() {
 }
 
 if (require.main === module) {
-  start().catch(() => {
-    console.error('API startup failed. Check Auth0 configuration and MongoDB connectivity.');
+  start().catch((err) => {
+    console.error('API startup failed:', err.message);
     process.exitCode = 1;
   });
 }
+
 module.exports = { createApp, start };
-
-{/*
-  const PORT = process.env.PORT || 5000;
-
-mongoose.connect(process.env.MONGO_URI).then(() =>
-  app.listen(PORT, () => console.log(`API on :${PORT}`))); 
-*/}
