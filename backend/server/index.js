@@ -27,8 +27,9 @@ function createApp() {
 
 async function start() {
   const app = createApp();
-  if (!process.env.MONGO_URI) throw new Error('Missing required environment variable: MONGO_URI');
-  await mongoose.connect(process.env.MONGO_URI);
+  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+  if (!mongoUri) throw new Error('Missing required environment variable: MONGO_URI or MONGODB_URI');
+  await mongoose.connect(mongoUri);
   const port = process.env.PORT || 5001;
   return app.listen(port, () => console.log(`API listening on port ${port}`));
 }
