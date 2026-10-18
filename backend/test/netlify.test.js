@@ -2,7 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 process.env.AUTH0_ISSUER_BASE_URL = 'https://test-tenant.auth0.com/';
 process.env.AUTH0_AUDIENCE = 'https://test-api';
-process.env.CLIENT_URL = 'https://hackwithyou.netlify.app';
+process.env.URL = 'https://hackwithyou.netlify.app';
 const db = require('../src/config/db');
 let failConnection = false;
 db.connectDB = async () => { if (failConnection) throw new Error('Database unavailable'); };

@@ -8,7 +8,6 @@ exports.handler = async (event, context = {}) => {
   context.callbackWaitsForEmptyEventLoop = false;
   let stage = 'configuration';
   try {
-    if (!process.env.CLIENT_URL && process.env.URL) process.env.CLIENT_URL = process.env.URL;
     if (!appHandler) appHandler = serverless(createApp());
     stage = 'database';
     await connectDB();

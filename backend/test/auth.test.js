@@ -2,7 +2,9 @@ const { test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
 process.env.AUTH0_ISSUER_BASE_URL = "https://test-tenant.auth0.com/";
 process.env.AUTH0_AUDIENCE = "https://test-api";
-process.env.CLIENT_URL = "http://localhost:5173";
+delete process.env.URL;
+process.env.NODE_ENV = "test";
+const developmentOrigin = "http://localhost:5173";
 const { createApp } = require("../server/index");
 let server;
 let base;
@@ -17,13 +19,13 @@ after(() =>
 
 test("health endpoint is public and allows the configured frontend origin", async () => {
   const response = await fetch(`${base}/api/health`, {
-    headers: { Origin: process.env.CLIENT_URL },
+    headers: { Origin: developmentOrigin },
   });
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { status: "ok" });
   assert.equal(
     response.headers.get("access-control-allow-origin"),
-    process.env.CLIENT_URL,
+    developmentOrigin,
   );
 });
 for (const route of ["/api/notes", "/api/profile/me"]) {
@@ -69,4 +71,25 @@ test("profile updates require a valid access token", async () => {
     body: JSON.stringify({ displayName: "Untrusted request" }),
   });
   assert.equal(response.status, 401);
+});
+
+test('unrecognized development origins do not receive cross-origin access', async () => {
+  const response = await fetch(`${base}/api/health`, { headers: { Origin: 'https://untrusted.example' } });
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('access-control-allow-origin'), null);
+});
+
+test('production uses same-origin requests without cross-origin headers', async () => {
+  const previous = process.env.NODE_ENV;
+  process.env.NODE_ENV = 'production';
+  const production = createApp().listen(0, '127.0.0.1');
+  try {
+    await new Promise(resolve => production.once('listening', resolve));
+    const response = await fetch(`http://127.0.0.1:${production.address().port}/api/health`, { headers: { Origin: 'https://untrusted.example' } });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('access-control-allow-origin'), null);
+  } finally {
+    await new Promise(resolve => production.close(resolve));
+    process.env.NODE_ENV = previous;
+  }
 });

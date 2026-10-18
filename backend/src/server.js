@@ -7,12 +7,15 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 function createApp() {
-  for (const name of ['AUTH0_ISSUER_BASE_URL', 'AUTH0_AUDIENCE', 'CLIENT_URL']) {
+  for (const name of ['AUTH0_ISSUER_BASE_URL', 'AUTH0_AUDIENCE']) {
     if (!process.env[name]) throw new Error(`Missing required environment variable: ${name}`);
   }
   const app = express();
   app.use(helmet());
-  app.use(cors({ origin: process.env.CLIENT_URL.split(',').map(origin => origin.trim()).filter(Boolean) }));
+  // Netlify serves the frontend and API on one origin; only local development needs CORS.
+  if (!process.env.URL && process.env.NODE_ENV !== 'production') {
+    app.use(cors({ origin: ['http://localhost:5173', 'http://127.0.0.1:5173'] }));
+  }
   app.use(express.json({ limit: '128kb' }));
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
   app.use('/api/notes', require('../server/routes/notes'));

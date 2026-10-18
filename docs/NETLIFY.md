@@ -14,9 +14,8 @@ Set these environment variables in the Netlify project dashboard before deployin
 | `AUTH0_ISSUER_BASE_URL` | `https://YOUR_TENANT.us.auth0.com/` | Functions |
 | `AUTH0_AUDIENCE` | Exactly the same registered API Identifier as `VITE_AUTH0_AUDIENCE` | Functions |
 | `MONGODB_URI` | Your existing complete Atlas connection string, retaining its database name | Functions |
-| `CLIENT_URL` | `https://hackwithyou.netlify.app` | Functions |
 
-`MONGO_URI` is also accepted; set one MongoDB URI variable, not conflicting values in both. Keep MongoDB credentials out of all `VITE_` variables. Netlify supplies the `URL` variable as a fallback if `CLIENT_URL` is absent. `PORT`, `JWT_SECRET`, Google client secrets, and an Auth0 client secret are not required for this deployment.
+`MONGO_URI` is also accepted; set one MongoDB URI variable, not conflicting values in both. Keep MongoDB credentials out of all `VITE_` variables. The deployed frontend and API share one origin, so no frontend-origin variable is required. `PORT`, `JWT_SECRET`, Google client secrets, and an Auth0 client secret are not required for this deployment.
 
 `netlify.toml` sets `VITE_API_URL` to an empty string for the build, which makes the API same-origin. Remove any dashboard override pointing it to localhost. Backend values must be provided in the dashboard; placing them only in `netlify.toml` does not provide them to function runtime. Redeploy after changing environment values because frontend configuration is baked into the build.
 

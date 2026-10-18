@@ -1,7 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { functionDiagnostics } = require('../src/config/functionDiagnostics');
-const configured = { AUTH0_AUDIENCE: 'example-api', AUTH0_ISSUER_BASE_URL: 'https://tenant.example/', CLIENT_URL: 'https://site.example', MONGODB_URI: 'mongodb://user:secret@host/test' };
+const configured = { AUTH0_AUDIENCE: 'example-api', AUTH0_ISSUER_BASE_URL: 'https://tenant.example/', MONGODB_URI: 'mongodb://user:secret@host/test' };
 test('function logs distinguish missing runtime settings from database failures', () => {
   const missing = functionDiagnostics(new Error('Sensitive error'), 'configuration', {});
   assert.equal(missing.code, 'RUNTIME_CONFIGURATION_MISSING');
