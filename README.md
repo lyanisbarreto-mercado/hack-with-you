@@ -28,3 +28,7 @@ npm run dev
 Use `frontend/.env.example` for configuration. Register `http://localhost:5173` as an allowed callback URL, logout URL, and web origin in your Auth0 SPA application. The frontend audience must equal the backend `AUTH0_AUDIENCE`. Run `npm run build` in `frontend/` to verify the production bundle. From the repository root, `npm run dev`, `npm run dev:backend`, `npm run build`, and `npm test` delegate to the appropriate project. Node 24 LTS is recommended.
 
 For future pulls, use `git pull --no-rebase origin main` to merge teammate commits while preserving history.
+
+The member directory is available at `GET /api/profile`. Authenticated profile updates accept `commitment`, `technology`, and `industry` tag arrays along with the existing basic fields. Only public profile fields are returned by directory and username lookups.
+
+`GET /api/notes` and `PUT /api/notes` read and save one private notepad for the verified Auth0 identity. PUT accepts `{ "content": "your note" }` (maximum 20,000 characters). The owner is always taken from the validated token, never a request-supplied user ID. Restart the backend after these route changes.
