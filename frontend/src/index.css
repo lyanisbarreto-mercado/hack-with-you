@@ -901,3 +901,268 @@ p {
   overflow-wrap: anywhere;
   line-height: 1.7;
 }
+
+/* Public landing and sign-in screens from the Fidelities frames. */
+.wordmark > .wordmark-name {
+  color: #d29580;
+}
+.landing-screen {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100dvh;
+  background: linear-gradient(135deg, #0d173a 0%, #26345f 48%, #4b609e 100%);
+}
+.landing-content {
+  width: min(900px, calc(100% - 96px));
+  margin-left: clamp(32px, 6.5vw, 110px);
+  padding: clamp(100px, 13.5vh, 160px) 0 100px;
+  position: relative;
+  z-index: 1;
+}
+.landing-content h1 {
+  margin: 0;
+  line-height: 1.1;
+}
+.landing-wordmark {
+  display: inline-flex;
+  align-items: center;
+  font-size: clamp(38px, 6vw, 88px);
+  letter-spacing: 0;
+  text-shadow: 2px 3px 0 #080e23;
+}
+.landing-wordmark > .wordmark-name {
+  color: #bd8a70;
+}
+.landing-tagline {
+  margin: 60px 0 0 105px;
+  font-size: clamp(27px, 2.7vw, 40px);
+  line-height: 1.35;
+  color: #fff;
+}
+.landing-actions {
+  display: flex;
+  gap: clamp(32px, 7.2vw, 106px);
+  margin-top: 160px;
+  padding-left: 12px;
+}
+.landing-button {
+  width: 310px;
+  min-height: 80px;
+  border: 2px solid #0a0b13;
+  border-radius: 16px;
+  box-shadow: 0 4px 5px #0005;
+  font-family: "Pixelify Sans", monospace;
+  font-size: 36px;
+  color: #090a10;
+}
+.landing-button:hover {
+  filter: brightness(1.07);
+}
+.landing-login {
+  background: #efe8b7;
+}
+.landing-signup {
+  background: #ffd600;
+}
+.landing-corner {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+.landing-corner-top {
+  width: 190px;
+  height: 18px;
+  background: #ccb42b;
+  top: 0;
+  left: -64px;
+  transform: rotate(-45deg);
+}
+.landing-corner-bottom {
+  width: 520px;
+  height: 520px;
+  right: -260px;
+  bottom: -260px;
+  transform: rotate(45deg);
+  background: #ccb42b;
+}
+.landing-corner-bottom::before {
+  content: "";
+  position: absolute;
+  inset: -82px;
+  border: 20px solid #ccb42b;
+}
+.signin-screen {
+  min-height: 100dvh;
+  background: var(--canvas);
+}
+.signin-topbar {
+  height: 73px;
+  background: #49598c;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 44px;
+}
+.brand-button {
+  background: none;
+  padding: 0;
+}
+.signin-content {
+  padding: clamp(50px, 10.2vh, 105px) 24px 80px;
+}
+.signin-form {
+  width: min(474px, 100%);
+  margin: 0 auto;
+}
+.signin-card {
+  background: #f7f7f7;
+  color: #0b0b0d;
+  border-radius: 20px;
+  padding: 28px 43px 92px;
+  display: grid;
+  gap: 24px;
+}
+.signin-card label {
+  display: grid;
+  gap: 8px;
+  font-size: 30px;
+}
+.signin-card input,
+.signin-card select {
+  width: 100%;
+  min-width: 0;
+  height: 31px;
+  border: 1px solid #25252a;
+  border-radius: 999px;
+  background: transparent;
+  color: #17171d;
+  padding: 2px 12px;
+  font-size: 16px;
+}
+.signin-card select {
+  border-color: #b6b6bc;
+}
+.signin-actions {
+  width: min(313px, 100%);
+  margin: 40px auto 0;
+  display: grid;
+  gap: 24px;
+}
+.signin-actions button {
+  min-height: 81px;
+  border-radius: 14px;
+  font-size: 30px;
+  color: #090a10;
+}
+.signin-submit {
+  background: #90a3e8;
+}
+.signin-signup {
+  background: #fff;
+}
+.signin-actions button:hover {
+  filter: brightness(0.94);
+}
+.preview-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 20px;
+  background: #303b64;
+  color: #fff;
+}
+.preview-nav a {
+  border: 1px solid #90a3e8;
+  border-radius: 5px;
+  padding: 4px 12px;
+  text-decoration: none;
+  font-size: 14px;
+}
+.preview-nav a[aria-current="page"] {
+  background: #90a3e8;
+  color: #10172f;
+}
+@media (max-width: 760px) {
+  .landing-content {
+    margin-inline: 28px;
+    width: calc(100% - 56px);
+    padding-top: 100px;
+  }
+  .landing-wordmark {
+    font-size: clamp(30px, 7.5vw, 58px);
+  }
+  .landing-tagline {
+    margin-left: 18px;
+    margin-top: 40px;
+  }
+  .landing-actions {
+    margin-top: 100px;
+    gap: 24px;
+    padding: 0;
+  }
+  .landing-button {
+    min-height: 65px;
+    font-size: 28px;
+    width: min(240px, 48%);
+  }
+  .landing-corner-bottom {
+    width: 310px;
+    height: 310px;
+    right: -175px;
+    bottom: -175px;
+  }
+  .signin-topbar {
+    height: 60px;
+    padding-inline: 20px;
+  }
+  .signin-topbar .wordmark {
+    font-size: 26px;
+  }
+  .signin-card {
+    padding: 28px 30px 60px;
+  }
+  .signin-card label {
+    font-size: 25px;
+  }
+  .signin-actions button {
+    min-height: 64px;
+    font-size: 25px;
+  }
+}
+@media (max-width: 420px) {
+  .landing-actions {
+    flex-direction: column;
+    margin-top: 70px;
+  }
+  .landing-button {
+    width: 100%;
+    max-width: 260px;
+  }
+  .landing-tagline {
+    font-size: 26px;
+    margin-left: 0;
+  }
+  .landing-content {
+    margin-inline: 20px;
+    width: calc(100% - 40px);
+  }
+  .landing-wordmark {
+    font-size: 29px;
+  }
+  .signin-card {
+    padding-inline: 22px;
+  }
+}
+.preview-nav {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  z-index: 60;
+  max-width: calc(100% - 24px);
+  border: 1px solid #90a3e8;
+  border-radius: 9px;
+  box-shadow: 0 5px 20px #0004;
+  padding: 8px 12px;
+}

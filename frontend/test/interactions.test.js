@@ -54,3 +54,17 @@ test("notes cannot be dragged out of any viewport edge or beyond a resized viewp
     { x: 0, y: 0 },
   );
 });
+
+import { currentRoute } from "../src/lib/routes.js";
+test("public screens route to landing, sign-in, and Home without changing profile links", () => {
+  assert.deepEqual(currentRoute(""), { page: "landing" });
+  assert.deepEqual(currentRoute("#/"), { page: "landing" });
+  assert.deepEqual(currentRoute("#/sign-in"), { page: "signin" });
+  assert.deepEqual(currentRoute("#/login"), { page: "signin" });
+  assert.deepEqual(currentRoute("#/home"), { page: "home" });
+  assert.deepEqual(currentRoute("#/users/me"), { page: "me", username: "me" });
+  assert.deepEqual(currentRoute("#/users/~people.507f1f77bcf86cd799439011"), {
+    page: "user",
+    username: "~people.507f1f77bcf86cd799439011",
+  });
+});

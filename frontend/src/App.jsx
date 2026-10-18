@@ -8,16 +8,10 @@ import NotesPopup from "./components/NotesPopup.jsx";
 import EditProfile from "./components/EditProfile.jsx";
 import useNotes from "./lib/useNotes.js";
 
-function currentRoute() {
-  const match = window.location.hash.match(/^#\/users\/([^/]+)$/);
-  if (!match) return { page: "home" };
-  try {
-    const username = decodeURIComponent(match[1]);
-    return { page: username === "me" ? "me" : "user", username };
-  } catch {
-    return { page: "home" };
-  }
-}
+import LandingPage from "./pages/LandingPage.jsx";
+import SignInPage from "./pages/SignInPage.jsx";
+import { currentRoute } from "./lib/routes.js";
+
 export default function App() {
   const {
     isLoading,
@@ -28,7 +22,7 @@ export default function App() {
     logout,
     getAccessTokenSilently,
   } = useAuth0();
-  const [route, setRoute] = useState(currentRoute);
+  const [route, setRoute] = useState(() => currentRoute());
   const [members, setMembers] = useState([]);
   const [directory, setDirectory] = useState({ loading: true, error: "" });
   const [profile, setProfile] = useState(null);
@@ -66,10 +60,13 @@ export default function App() {
   const navigate = useCallback((username) => {
     window.location.hash = username
       ? `/users/${encodeURIComponent(username)}`
-      : "/";
+      : "/home";
   }, []);
   useEffect(() => {
-    const changed = () => setRoute(currentRoute());
+    const changed = () => {
+      setRoute(currentRoute());
+      setEditOpen(false);
+    };
     window.addEventListener("hashchange", changed);
     return () => window.removeEventListener("hashchange", changed);
   }, []);
@@ -85,12 +82,13 @@ export default function App() {
     }
   }, []);
   useEffect(() => {
+    if (route.page !== "home") return;
     const controller = new AbortController();
     loadMembers(controller.signal);
     return () => controller.abort();
-  }, [loadMembers]);
+  }, [loadMembers, route.page]);
   useEffect(() => {
-    if (route.page === "home" || isLoading) return;
+    if (!["me", "user"].includes(route.page) || isLoading) return;
     const controller = new AbortController();
     setProfile(null);
     setProfileState({ loading: true, error: "" });
@@ -157,6 +155,28 @@ export default function App() {
       profile.source !== "people" &&
       myProfile?._id === profile._id
     );
+  if (route.page === "landing") {
+    return (
+      <LandingPage
+        onLogin={() => {
+          window.location.hash = "/sign-in";
+        }}
+        onSignUp={() => {
+          window.location.hash = "/signup";
+        }}
+      />
+    );
+  }
+  if (route.page === "signin") {
+    return (
+      <SignInPage
+        onContinue={() => navigate()}
+        onBack={() => {
+          window.location.hash = "/";
+        }}
+      />
+    );
+  }
   return (
     <div className="app-shell">
       <a
@@ -175,13 +195,15 @@ export default function App() {
         avatar={user?.picture}
         onHome={() => navigate()}
         onProfile={() => navigate("me")}
-        onLogin={login}
+        onLogin={() => {
+          window.location.hash = "/sign-in";
+        }}
         onLogout={() =>
           logout({ logoutParams: { returnTo: window.location.origin } })
         }
       />
       <header className="topbar">
-        <a href="#/" className="wordmark" aria-label="Hack With You home">
+        <a href="#/home" className="wordmark" aria-label="Hack With You home">
           <span>〈</span>“hackWithYou”<span>〉</span>
         </a>
       </header>
