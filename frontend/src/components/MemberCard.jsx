@@ -26,7 +26,9 @@ export default function MemberCard({ member, onOpen }) {
   return (
     <button
       className="member-card"
-      onClick={() => onOpen(member.username)}
+      onClick={() =>
+        onOpen(member.profileKey || member.username || `~${member._id}`)
+      }
       aria-label={`View ${member.displayName || member.username}'s profile`}
     >
       <Avatar src={member.avatarUrl} name={member.displayName} />

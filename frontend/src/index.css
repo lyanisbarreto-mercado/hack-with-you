@@ -895,3 +895,9 @@ p {
 .unsaved-note {
   color: #34467c;
 }
+
+.project-description p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}

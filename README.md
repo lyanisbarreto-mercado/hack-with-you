@@ -1,6 +1,6 @@
 # hack-with-you
 
-The backend uses CommonJS and Auth0 bearer access tokens. Start it from `backend/`:
+The backend uses CommonJS and Auth0 bearer access tokens. Its entry point is `backend/src/server.js`, with the MongoDB helper in `backend/src/config/db.js`. Existing routes and models remain in `backend/server/`; `backend/server/index.js` forwards to the same application for compatibility. Start it from `backend/`:
 
 ```sh
 npm install
@@ -11,7 +11,7 @@ Configure `backend/server/.env` using `backend/server/.env.example`. Existing en
 
 `GET /api/health` is public. `/api/notes` and `/api/profile/me` require an Auth0 access token in `Authorization: Bearer <token>`. The first authenticated profile request creates a MongoDB profile keyed by the verified token's `sub`. `PATCH /api/profile/me` updates profile fields; `GET /api/profile/:username` returns public fields only. Existing accounts are not automatically linked by email.
 
-Legacy `server/routes/auth.js` and `server/config/passport.js` are inactive and retained for migration reference. Login, registration, Google login, and logout should be handled by the Auth0 React SDK; the backend no longer issues login cookies. The React frontend lives in `frontend/` and uses Auth0Provider with configuration from `frontend/.env.local`.
+Login, registration, Google login, and logout should be handled by the Auth0 React SDK; the backend no longer issues login cookies. The React frontend lives in `frontend/` and uses Auth0Provider with configuration from `frontend/.env.local`.
 
 Run backend checks with `cd backend && npm test`. These checks cover public health access and rejection of absent or malformed credentials; a real Auth0 login and MongoDB connection are required for end-to-end verification.
 
@@ -32,3 +32,9 @@ For future pulls, use `git pull --no-rebase origin main` to merge teammate commi
 The member directory is available at `GET /api/profile`. Authenticated profile updates accept `commitment`, `technology`, and `industry` tag arrays along with the existing basic fields. Only public profile fields are returned by directory and username lookups.
 
 `GET /api/notes` and `PUT /api/notes` read and save one private notepad for the verified Auth0 identity. PUT accepts `{ "content": "your note" }` (maximum 20,000 characters). The owner is always taken from the validated token, never a request-supplied user ID. Restart the backend after these route changes.
+
+Imported members are read from the `People` collection in the `user` database using the existing MongoDB connection. They appear alongside Auth0 profiles in the directory and open through stable `~people.<MongoDB ID>` profile keys; no username or account linking is required. Imported records are read-only through this API.
+
+The API maps `first_name` and `last_name` to the display name, `coding_languages` to technology tags, `hackathon_experience` to experience, `learning_interest` to Learning, `competitive` to Competitive/Casual, `github_link` and `linkedin_link` to social links, and `project_description` to the current project text. Pronouns are displayed directly. Recognized learning interests also populate industry tags, including normalization of Cybersecurity to Cyber Security. Fields absent from the data, such as organizations and upcoming events, retain their empty states. Email and imported notes are never included in public profile responses.
+
+`MOCK_DATA.json` is only a local reference; the application does not import it or require it at runtime. Removing that file does not remove MongoDB records. Restart the backend after changing profile routes.

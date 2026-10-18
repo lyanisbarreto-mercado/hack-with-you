@@ -130,14 +130,25 @@ export default function User({
           </section>
           <section>
             <h2>Current Project</h2>
-            {profile.currentProject?.name ? (
-              <article className="project-card">
-                <div className="project-placeholder">
-                  <Icon name="notes" size={54} />
-                </div>
-                <h3 className="card-name pixel">
-                  {profile.currentProject.name}
-                </h3>
+            {profile.currentProject?.name ||
+            profile.currentProject?.description ? (
+              <article
+                className={
+                  profile.currentProject.name
+                    ? "project-card"
+                    : "project-description"
+                }
+              >
+                {profile.currentProject.name && (
+                  <>
+                    <div className="project-placeholder">
+                      <Icon name="notes" size={54} />
+                    </div>
+                    <h3 className="card-name pixel">
+                      {profile.currentProject.name}
+                    </h3>
+                  </>
+                )}
                 <p>{profile.currentProject.description}</p>
               </article>
             ) : (

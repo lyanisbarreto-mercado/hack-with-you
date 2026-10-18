@@ -151,7 +151,12 @@ export default function App() {
     loadMembers();
   };
   const own =
-    route.page === "me" || !!(profile?._id && myProfile?._id === profile._id);
+    route.page === "me" ||
+    !!(
+      profile?._id &&
+      profile.source !== "people" &&
+      myProfile?._id === profile._id
+    );
   return (
     <div className="app-shell">
       <a

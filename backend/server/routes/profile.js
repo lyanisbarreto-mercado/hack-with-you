@@ -1,8 +1,12 @@
 const router = require("express").Router();
 const checkJwt = require("../middleware/auth");
 const User = require("../models/User");
-const publicFields =
-  "username displayName bio avatarUrl commitment technology industry createdAt";
+const {
+  publicProfileFields: publicFields,
+  toProfileView,
+} = require("../lib/profileView");
+const mongoose = require("mongoose");
+const People = require("../lib/peopleRepository");
 const tagLimits = { commitment: 2, technology: 11, industry: 3 };
 
 async function ensureProfile(auth0Id) {
@@ -21,16 +25,29 @@ async function ensureProfile(auth0Id) {
 }
 // Directory and public profiles contain only fields intended for other members.
 router.get("/", async (req, res) => {
-  const users = await User.find({ username: { $type: "string", $ne: "" } })
-    .select(publicFields)
-    .sort({ createdAt: -1 });
-  res.json(users);
+  const [users, people] = await Promise.all([
+    User.find({
+      $or: [
+        { username: { $type: "string", $ne: "" } },
+        { first_name: { $type: "string", $ne: "" } },
+        { last_name: { $type: "string", $ne: "" } },
+      ],
+    })
+      .select(publicFields)
+      .sort({ createdAt: -1 })
+      .lean(),
+    People.listPeople(),
+  ]);
+  res.json([
+    ...users.map((user) => toProfileView(user)),
+    ...people.map((person) => toProfileView(person, "people")),
+  ]);
 });
 router.get("/me", checkJwt, async (req, res) => {
   res.set("Cache-Control", "no-store");
   if (typeof req.auth.payload.sub !== "string" || !req.auth.payload.sub)
     return res.status(401).json({ error: "Token has no user identity" });
-  res.json(await ensureProfile(req.auth.payload.sub));
+  res.json(toProfileView(await ensureProfile(req.auth.payload.sub)));
 });
 router.patch("/me", checkJwt, async (req, res) => {
   res.set("Cache-Control", "no-store");
@@ -65,7 +82,7 @@ router.patch("/me", checkJwt, async (req, res) => {
       { $set: updates },
       { new: true, runValidators: true },
     );
-    res.json(user);
+    res.json(toProfileView(user));
   } catch (err) {
     if (err.code === 11000)
       return res.status(409).json({ error: "That username is already in use" });
@@ -76,11 +93,25 @@ router.patch("/me", checkJwt, async (req, res) => {
     throw err;
   }
 });
-router.get("/:username", async (req, res) => {
-  const user = await User.findOne({
-    username: req.params.username.toLowerCase(),
-  }).select(publicFields);
+router.get("/:identifier", async (req, res) => {
+  const identifier = req.params.identifier;
+  if (identifier.startsWith("~people.")) {
+    const id = identifier.slice("~people.".length);
+    if (!mongoose.isObjectIdOrHexString(id))
+      return res.status(404).json({ error: "Profile not found" });
+    const person = await People.findPerson(id);
+    if (!person) return res.status(404).json({ error: "Profile not found" });
+    return res.json(toProfileView(person, "people"));
+  }
+  // Imported members have no username. The ~ prefix cannot collide with valid usernames.
+  const query = identifier.startsWith("~")
+    ? mongoose.isObjectIdOrHexString(identifier.slice(1))
+      ? { _id: identifier.slice(1) }
+      : null
+    : { username: identifier.toLowerCase() };
+  if (!query) return res.status(404).json({ error: "Profile not found" });
+  const user = await User.findOne(query).select(publicFields).lean();
   if (!user) return res.status(404).json({ error: "Profile not found" });
-  res.json(user);
+  res.json(toProfileView(user));
 });
 module.exports = router;

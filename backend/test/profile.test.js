@@ -51,8 +51,9 @@ test("profile edits cannot select another owner or change private identity field
   });
   assert.equal(response.status, 200);
   const result = await response.json();
-  assert.equal(result.auth0Id, "auth0|alice");
-  assert.equal(result._id, undefined);
+  assert.equal(result.auth0Id, undefined);
+  assert.equal(profiles.get("auth0|alice").auth0Id, "auth0|alice");
+  assert.notEqual(result._id, "bob");
   assert.equal(profiles.get("auth0|bob").displayName, "Bob");
 });
 test("profile input rejects tag operators, non-string fields, and reserved usernames", async () => {

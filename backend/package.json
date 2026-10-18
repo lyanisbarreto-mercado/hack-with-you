@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server/index.js",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "node server/index.js",
-    "start": "node server/index.js",
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
     "test": "node --test"
   },
   "keywords": [],
