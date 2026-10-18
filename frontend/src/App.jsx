@@ -154,7 +154,14 @@ export default function App() {
     route.page === "me" || !!(profile?._id && myProfile?._id === profile._id);
   return (
     <div className="app-shell">
-      <a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById("main-content")?.focus(); }}>
+      <a
+        className="skip-link"
+        href="#main-content"
+        onClick={(event) => {
+          event.preventDefault();
+          document.getElementById("main-content")?.focus();
+        }}
+      >
         Skip to content
       </a>
       <NavBar
@@ -175,10 +182,15 @@ export default function App() {
       </header>
       {((authError && authError !== dismissedAuthError) || notice) && (
         <div className="app-notice" role="status">
-          {authError !== dismissedAuthError ? authError?.message || notice : notice}
+          {authError !== dismissedAuthError
+            ? authError?.message || notice
+            : notice}
           <button
             aria-label="Dismiss notification"
-            onClick={() => { setNotice(""); setDismissedAuthError(authError); }}
+            onClick={() => {
+              setNotice("");
+              setDismissedAuthError(authError);
+            }}
           >
             ×
           </button>

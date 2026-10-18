@@ -29,7 +29,9 @@ function Preview() {
     [edit, setEdit] = useState(false);
   return (
     <div className="app-shell">
-      <div className="app-notice" role="status">Component preview · sample data · changes are not saved</div>
+      <div className="app-notice" role="status">
+        Component preview · sample data · changes are not saved
+      </div>
       <NavBar
         page={page}
         isAuthenticated
