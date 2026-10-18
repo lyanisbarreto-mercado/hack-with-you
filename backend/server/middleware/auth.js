@@ -1,12 +1,7 @@
-// middleware/auth.js
-const jwt = require('jsonwebtoken');
+const { auth } = require('express-oauth2-jwt-bearer');
 
-module.exports = function requireAuth(req, res, next) {
-  try {
-    const { sub } = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
-    req.userId = sub;
-    next();
-  } catch {
-    res.status(401).json({ error: 'Not authenticated' });
-  }
-};
+module.exports = auth({
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+  audience: process.env.AUTH0_AUDIENCE,
+  tokenSigningAlg: 'RS256',
+});
